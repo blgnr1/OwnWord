@@ -1,4 +1,4 @@
-package com.example.own_words
+package com.blgnr1.ownwords
 
 import io.flutter.embedding.android.FlutterActivity
 
