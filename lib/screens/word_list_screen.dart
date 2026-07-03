@@ -67,7 +67,7 @@ class _WordListScreenState extends ConsumerState<WordListScreen> {
                         alignment: Alignment.centerRight,
                         decoration: BoxDecoration(
                           color: Colors.redAccent,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(28),
                         ),
                         child: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 28),
                       ),
@@ -143,9 +143,9 @@ class _WordListScreenState extends ConsumerState<WordListScreen> {
                   children: [
                     const Text('Antrenman Yönü', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                     const SizedBox(height: 24),
-                    _directionBtn(c, '🇹🇷 TR → EN', StudyDirection.trToEn, AppTheme.bubblegumPink),
+                    _directionBtn(c, '🇹🇷 Türkçe → Yabancı', StudyDirection.trToEn, AppTheme.bubblegumPink),
                     const SizedBox(height: 12),
-                    _directionBtn(c, '🇬🇧 EN → TR', StudyDirection.enToTr, AppTheme.skyBlue),
+                    _directionBtn(c, '🌐 Yabancı → Türkçe', StudyDirection.enToTr, AppTheme.skyBlue),
                   ],
                 ),
               ),
@@ -207,11 +207,13 @@ class _WordItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0xFFEFEFEF), width: 1.0),
+        boxShadow: AppTheme.premiumShadow,
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),

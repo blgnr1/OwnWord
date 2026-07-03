@@ -14,10 +14,31 @@ class AppTheme {
   static const Color electricBlue  = Color(0xFF2979FF);
   static const Color mintGreen     = Color(0xFF00BFA5);
 
-  static const Color softBackground = Color(0xFFF2F2F7); // Minimalist Light Gray
+  static const Color softBackground = Color(0xFFF8F9FA); // Ultra-clean premium light gray
   static const Color whiteSurface   = Color(0xFFFFFFFF);
-  static const Color textMain       = Color(0xFF1C1C1E); // iOS-style dark text
-  static const Color textMuted      = Color(0xFF8E8E93); // iOS-style muted text
+  static const Color textMain       = Color(0xFF1A1A1E); // Sleeker dark text
+  static const Color textMuted      = Color(0xFF7A7A85); // Modern muted text
+
+  static List<BoxShadow> get premiumShadow => [
+    BoxShadow(
+      color: const Color(0xFF1A1A1E).withAlpha(12),
+      blurRadius: 24,
+      offset: const Offset(0, 8),
+    ),
+    BoxShadow(
+      color: const Color(0xFF1A1A1E).withAlpha(4),
+      blurRadius: 8,
+      offset: const Offset(0, 2),
+    ),
+  ];
+
+  static List<BoxShadow> get cardShadow => [
+    BoxShadow(
+      color: Colors.black.withAlpha(8),
+      blurRadius: 16,
+      offset: const Offset(0, 6),
+    ),
+  ];
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -34,8 +55,8 @@ class AppTheme {
       ),
       textTheme: GoogleFonts.nunitoTextTheme().copyWith(
         displayLarge: GoogleFonts.nunito(fontWeight: FontWeight.bold, color: textMain),
-        titleLarge: GoogleFonts.nunito(fontWeight: FontWeight.w700, color: textMain),
-        bodyLarge: GoogleFonts.nunito(color: textMain, fontSize: 16),
+        titleLarge: GoogleFonts.nunito(fontWeight: FontWeight.w800, color: textMain),
+        bodyLarge: GoogleFonts.nunito(color: textMain, fontSize: 16, fontWeight: FontWeight.w600),
         bodyMedium: GoogleFonts.nunito(color: textMuted),
       ),
       appBarTheme: const AppBarTheme(
@@ -45,34 +66,35 @@ class AppTheme {
         centerTitle: true,
         surfaceTintColor: Colors.transparent,
         systemOverlayStyle: SystemUiOverlayStyle(
-          systemNavigationBarColor: Color(0xFF000000),
-          systemNavigationBarIconBrightness: Brightness.light,
+          systemNavigationBarColor: Color(0xFFF8F9FA),
+          systemNavigationBarIconBrightness: Brightness.dark,
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.dark,
         ),
         titleTextStyle: TextStyle(
           color: textMain,
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          // No hardcoded fontFamily — inherits from textTheme
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+          letterSpacing: -0.5,
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: bubblegumPink,
           foregroundColor: Colors.white,
-          elevation: 0,
-          textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+          elevation: 4,
+          shadowColor: bubblegumPink.withAlpha(80),
+          textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, letterSpacing: 0.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
         ),
       ),
       cardTheme: CardThemeData(
         color: whiteSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: const BorderSide(color: Colors.black12, width: 0.5),
+          borderRadius: BorderRadius.circular(28),
+          side: const BorderSide(color: Color(0xFFEFEFEF), width: 1.0),
         ),
       ),
     );

@@ -64,6 +64,7 @@ class DailyMission {
   final int xpReward;
   final bool isCompleted;
   final String date;
+  final String type;
 
   DailyMission({
     required this.id,
@@ -73,6 +74,7 @@ class DailyMission {
     required this.xpReward,
     this.isCompleted = false,
     required this.date,
+    required this.type,
   });
 
   Map<String, dynamic> toMap() {
@@ -84,6 +86,7 @@ class DailyMission {
       'xpReward': xpReward,
       'isCompleted': isCompleted ? 1 : 0,
       'date': date,
+      'type': type,
     };
   }
 
@@ -96,6 +99,7 @@ class DailyMission {
       xpReward: map['xpReward'] as int,
       isCompleted: map['isCompleted'] == 1,
       date: map['date'] as String,
+      type: (map['type'] as String?) ?? 'legacy',
     );
   }
 
@@ -107,6 +111,7 @@ class DailyMission {
     int? xpReward,
     bool? isCompleted,
     String? date,
+    String? type,
   }) {
     return DailyMission(
       id: id ?? this.id,
@@ -116,6 +121,7 @@ class DailyMission {
       xpReward: xpReward ?? this.xpReward,
       isCompleted: isCompleted ?? this.isCompleted,
       date: date ?? this.date,
+      type: type ?? this.type,
     );
   }
 }

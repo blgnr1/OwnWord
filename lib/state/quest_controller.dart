@@ -83,7 +83,14 @@ class QuestController extends Notifier<LinguistQuestState> {
     await gCtrl.addXP(xp);
     await gCtrl.incrementBossProgress();
     await gCtrl.incrementStreak();
-    await gCtrl.updateProgress('20 Soru Yanıtla (+50 XP)', 1);
+    await gCtrl.updateProgress('answer_questions', 1);
+
+    if (state.comboCount + 1 >= 5) {
+      await gCtrl.updateProgress('combo_streak', 1);
+    }
+    if (word.isDifficult) {
+      await gCtrl.updateProgress('difficult_practice', 1);
+    }
     
     state = state.copyWith(comboCount: state.comboCount + 1);
     // lastXPGain (popup feedback) is removed per request
@@ -104,7 +111,7 @@ class QuestController extends Notifier<LinguistQuestState> {
     );
 
     await _onStudySuccess(word, 5);
-    await ref.read(gamificationProvider.notifier).updateProgress('10 Kelime Öğren (+50 XP)', 1, wordId: word.id);
+    await ref.read(gamificationProvider.notifier).updateProgress('learn_words', 1, wordId: word.id);
     await _updateWordState(updatedWord, true);
     await _db.incrementDailyStat('studied');
     
@@ -137,7 +144,7 @@ class QuestController extends Notifier<LinguistQuestState> {
     final finalizedWord = updatedWord.copyWith(masteryLevel: updatedWord.calculatedMasteryLevel);
 
     await _onStudySuccess(word, 10);
-    await ref.read(gamificationProvider.notifier).updateProgress('10 Kelime Öğren (+50 XP)', 1, wordId: word.id);
+    await ref.read(gamificationProvider.notifier).updateProgress('learn_words', 1, wordId: word.id);
     await _updateWordState(finalizedWord, true);
     await _db.incrementDailyStat('studied');
   }
@@ -179,8 +186,8 @@ class QuestController extends Notifier<LinguistQuestState> {
       final finalizedWord = updatedWord.copyWith(masteryLevel: updatedWord.calculatedMasteryLevel);
 
       await _onStudySuccess(word, 20);
-      await ref.read(gamificationProvider.notifier).updateProgress('10 Kelime Öğren (+50 XP)', 1, wordId: word.id);
-      await ref.read(gamificationProvider.notifier).updateProgress('5 Yazım Egzersizi Yap (+50 XP)', 1);
+      await ref.read(gamificationProvider.notifier).updateProgress('learn_words', 1, wordId: word.id);
+      await ref.read(gamificationProvider.notifier).updateProgress('do_spelling', 1);
       await _updateWordState(finalizedWord, true);
       await _db.incrementDailyStat('studied');
       

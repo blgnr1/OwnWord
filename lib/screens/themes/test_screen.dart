@@ -5,6 +5,7 @@ import '../../state/quest_state.dart';
 import '../../theme/app_theme.dart';
 import '../../models/word_record.dart';
 import '../../services/audio_service.dart';
+import 'dart:math' as math;
 
 class TestScreen extends ConsumerStatefulWidget {
   const TestScreen({super.key});
@@ -61,14 +62,31 @@ class _TestScreenState extends ConsumerState<TestScreen> with TickerProviderStat
     final isTrToEn = ref.read(questProvider).direction == StudyDirection.trToEn;
 
     final correctAnswer = isTrToEn ? word.english : word.turkish;
-    final distractors = _allWords
-        .where((w) => w.id != word.id)
-        .map((w) => isTrToEn ? w.english : w.turkish)
-        .where((val) => val.isNotEmpty)
-        .toSet()
-        .toList()..shuffle();
+    final Set<String> distractorSet = {};
+    final rand = math.Random();
+    
+    int attempts = 0;
+    while (distractorSet.length < 3 && attempts < 150) {
+      attempts++;
+      final w = _allWords[rand.nextInt(_allWords.length)];
+      if (w.id == word.id) continue;
+      final val = isTrToEn ? w.english : w.turkish;
+      if (val.trim().isEmpty || val == correctAnswer) continue;
+      distractorSet.add(val);
+    }
 
-    _currentChoices = [correctAnswer, ...distractors.take(3)]..shuffle();
+    if (distractorSet.length < 3) {
+      distractorSet.addAll(
+        _allWords
+            .where((w) => w.id != word.id)
+            .map((w) => isTrToEn ? w.english : w.turkish)
+            .where((val) => val.isNotEmpty && val != correctAnswer)
+      );
+    }
+
+    final distractors = distractorSet.toList()..shuffle(rand);
+
+    _currentChoices = [correctAnswer, ...distractors.take(3)]..shuffle(rand);
     _selectedChoice = null;
   }
 

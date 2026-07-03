@@ -63,7 +63,6 @@ class _BossQuizScreenState extends ConsumerState<BossQuizScreen> with TickerProv
     }
 
     setState(() {
-      final rand = math.Random();
       final List<WordRecord> selected = [];
       
       if (allWords.length >= 40) {
@@ -109,14 +108,30 @@ class _BossQuizScreenState extends ConsumerState<BossQuizScreen> with TickerProv
     
     final s = ref.read(questProvider);
     final allCandidates = [...s.activeDeck, ...s.learnedDeck];
-    final distractors = allCandidates
-        .where((w) => w.id != word.id)
-        .map((w) => _isQuestionTrToEn ? w.english : w.turkish)
-        .where((val) => val.isNotEmpty)
-        .toSet()
-        .toList()..shuffle();
+    final Set<String> distractorSet = {};
+    final rand = math.Random();
+    
+    int attempts = 0;
+    while (distractorSet.length < 3 && attempts < 150) {
+      attempts++;
+      final w = allCandidates[rand.nextInt(allCandidates.length)];
+      if (w.id == word.id) continue;
+      final val = _isQuestionTrToEn ? w.english : w.turkish;
+      if (val.trim().isEmpty || val == correct) continue;
+      distractorSet.add(val);
+    }
 
-    _choices = [correct, ...distractors.take(3)]..shuffle();
+    if (distractorSet.length < 3) {
+      distractorSet.addAll(
+        allCandidates
+            .where((w) => w.id != word.id)
+            .map((w) => _isQuestionTrToEn ? w.english : w.turkish)
+            .where((val) => val.isNotEmpty && val != correct)
+      );
+    }
+
+    final distractors = distractorSet.toList()..shuffle(rand);
+    _choices = [correct, ...distractors.take(3)]..shuffle(rand);
   }
 
   Future<void> _handleAnswer(bool correct) async {
@@ -226,7 +241,7 @@ class _BossQuizScreenState extends ConsumerState<BossQuizScreen> with TickerProv
       children: [
         Text(prompt, style: const TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: Colors.white), textAlign: TextAlign.center),
         const SizedBox(height: 12),
-        Text(_isQuestionTrToEn ? 'İngilizce Karşılığını Seç/Yaz' : 'Türkçe Karşılığını Seç/Yaz', style: const TextStyle(color: Colors.white38, fontSize: 14)),
+        Text(_isQuestionTrToEn ? 'Yabancı Dildeki Karşılığını Seç/Yaz' : 'Türkçe Karşılığını Seç/Yaz', style: const TextStyle(color: Colors.white38, fontSize: 14)),
         const SizedBox(height: 48),
         if (_currentMode == 'test') ..._choices.map((c) => _testOption(c, word, state))
         else ...[

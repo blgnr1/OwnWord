@@ -46,7 +46,9 @@ class GamificationController extends Notifier<LinguistGamificationState> {
     
     final lastDate = DateTime.parse(profile.lastStudyDate!);
     final now = DateTime.now();
-    final diff = now.difference(lastDate).inDays;
+    final lastDateNormalized = DateTime(lastDate.year, lastDate.month, lastDate.day);
+    final todayNormalized = DateTime(now.year, now.month, now.day);
+    final diff = todayNormalized.difference(lastDateNormalized).inDays;
 
     if (diff > 1) {
       final updated = profile.copyWith(currentStreak: 0);
@@ -57,29 +59,28 @@ class GamificationController extends Notifier<LinguistGamificationState> {
   }
 
   List<DailyMission> _generateDailyMissions(String date) {
-    return [
-      DailyMission(
-        id: const Uuid().v4(),
-        title: '10 Kelime Öğren (+50 XP)',
-        target: 10,
-        xpReward: 50,
-        date: date,
-      ),
-      DailyMission(
-        id: const Uuid().v4(),
-        title: '20 Soru Yanıtla (+50 XP)',
-        target: 20,
-        xpReward: 50,
-        date: date,
-      ),
-      DailyMission(
-        id: const Uuid().v4(),
-        title: '5 Yazım Egzersizi Yap (+50 XP)',
-        target: 5,
-        xpReward: 50,
-        date: date,
-      ),
+    final templates = [
+      _MissionTemplate(title: '10 Kelime Çalış', target: 10, xpReward: 50, type: 'learn_words'),
+      _MissionTemplate(title: '15 Soru Yanıtla', target: 15, xpReward: 50, type: 'answer_questions'),
+      _MissionTemplate(title: '5 Kelime Yaz', target: 5, xpReward: 50, type: 'do_spelling'),
+      _MissionTemplate(title: 'Hız Modunda Oyna', target: 1, xpReward: 40, type: 'speed_mode'),
+      _MissionTemplate(title: '5 Soru Kombo Yap', target: 5, xpReward: 60, type: 'combo_streak'),
+      _MissionTemplate(title: 'Yeni Klasör Oluştur', target: 1, xpReward: 30, type: 'create_folder'),
+      _MissionTemplate(title: '3 Zor Kelime Çalış', target: 3, xpReward: 40, type: 'difficult_practice'),
     ];
+    
+    // Choose 3 unique mission templates randomly
+    templates.shuffle();
+    final selected = templates.take(3).toList();
+
+    return selected.map((t) => DailyMission(
+      id: const Uuid().v4(),
+      title: t.title,
+      target: t.target,
+      xpReward: t.xpReward,
+      type: t.type,
+      date: date,
+    )).toList();
   }
 
   Future<void> addXP(int xp) async {
@@ -110,16 +111,16 @@ class GamificationController extends Notifier<LinguistGamificationState> {
     state = state.copyWith(showLevelUp: false);
   }
 
-  Future<void> updateProgress(String missionTitle, int increment, {String? wordId}) async {
+  Future<void> updateProgress(String missionType, int increment, {String? wordId}) async {
     final missions = [...state.todayMissions];
-    final index = missions.indexWhere((m) => m.title == missionTitle);
+    final index = missions.indexWhere((m) => m.type == missionType);
     
     if (index != -1) {
       var mission = missions[index];
       if (mission.isCompleted) return;
 
       // Special check for distinct words
-      if (mission.title == '10 Kelime Öğren (+50 XP)' && wordId != null) {
+      if (missionType == 'learn_words' && wordId != null) {
         if (state.processedWordIds.contains(wordId)) return;
         final newProcessed = Set<String>.from(state.processedWordIds)..add(wordId);
         state = state.copyWith(processedWordIds: newProcessed);
@@ -169,4 +170,17 @@ class GamificationController extends Notifier<LinguistGamificationState> {
     await _db.updatePlayerProfile(updated);
     state = state.copyWith(profile: updated);
   }
+}
+
+class _MissionTemplate {
+  final String title;
+  final int target;
+  final int xpReward;
+  final String type;
+  _MissionTemplate({
+    required this.title,
+    required this.target,
+    required this.xpReward,
+    required this.type,
+  });
 }

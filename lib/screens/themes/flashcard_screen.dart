@@ -253,34 +253,4 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
       ),
     );
   }
-
-  Widget _buildSwipeBackground(bool isUp) {
-    return Container(
-      alignment: isUp ? Alignment.bottomCenter : Alignment.topCenter,
-      padding: const EdgeInsets.symmetric(vertical: 40),
-      color: isUp 
-          ? AppTheme.grassGreen.withAlpha(200) 
-          : AppTheme.bubblegumPink.withAlpha(200),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            isUp ? Icons.check_circle_rounded : Icons.replay_circle_filled_rounded,
-            color: Colors.white,
-            size: 80,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            isUp ? 'BİLİYORUM' : 'TEKRAR',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 2,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

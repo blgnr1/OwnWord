@@ -83,16 +83,31 @@ class _SpeedModeScreenState extends ConsumerState<SpeedModeScreen> {
     
     final correct = _isQuestionTrToEn ? _currentWord!.english : _currentWord!.turkish;
     
-    final distractors = _allWords
-        .where((w) => w.id != _currentWord!.id)
-        .map((w) => _isQuestionTrToEn ? w.english : w.turkish)
-        .where((val) => val.isNotEmpty)
-        .toSet()
-        .toList()..shuffle();
+    final Set<String> distractorSet = {};
+    int attempts = 0;
+    while (distractorSet.length < 3 && attempts < 150) {
+      attempts++;
+      final w = _allWords[rand.nextInt(_allWords.length)];
+      if (w.id == _currentWord!.id) continue;
+      final val = _isQuestionTrToEn ? w.english : w.turkish;
+      if (val.trim().isEmpty || val == correct) continue;
+      distractorSet.add(val);
+    }
+
+    if (distractorSet.length < 3) {
+      distractorSet.addAll(
+        _allWords
+            .where((w) => w.id != _currentWord!.id)
+            .map((w) => _isQuestionTrToEn ? w.english : w.turkish)
+            .where((val) => val.isNotEmpty && val != correct)
+      );
+    }
+
+    final distractors = distractorSet.toList()..shuffle(rand);
 
     if (mounted) {
       setState(() {
-        _choices = [correct, ...distractors.take(3)]..shuffle();
+        _choices = [correct, ...distractors.take(3)]..shuffle(rand);
       });
     }
   }
@@ -173,7 +188,7 @@ class _SpeedModeScreenState extends ConsumerState<SpeedModeScreen> {
           style: const TextStyle(fontSize: 52, fontWeight: FontWeight.w900, color: Colors.white),
           textAlign: TextAlign.center),
         const SizedBox(height: 8),
-        Text(_isQuestionTrToEn ? 'İngilizcesini Seç' : 'Türkçesini Seç', 
+        Text(_isQuestionTrToEn ? 'Yabancı Dildeki Karşılığını Seç' : 'Türkçe Karşılığını Seç', 
           style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
       ],
     );

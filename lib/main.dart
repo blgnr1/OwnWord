@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'theme/app_theme.dart';
 import 'screens/dashboard_screen.dart';
 import 'services/notification_service.dart';
+import 'services/audio_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,16 +17,17 @@ void main() async {
       await NotificationService.instance.init();
       print('DEBUG: Scheduling streak reminder...');
       await NotificationService.instance.scheduleStreakReminder();
+      print('DEBUG: Initializing audio players and warming TTS...');
+      await AudioService.instance.init();
       print('DEBUG: All initializations complete.');
     } catch (e) {
       print('DEBUG: Error during initialization: $e');
     }
   });
 
-  // Force edge-to-edge and set initial black nav bar
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    systemNavigationBarColor: Color(0xFF000000),
-    systemNavigationBarIconBrightness: Brightness.light,
+    systemNavigationBarColor: Color(0xFFF8F9FA),
+    systemNavigationBarIconBrightness: Brightness.dark,
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.dark,
   ));
@@ -41,16 +43,6 @@ class OwnWordsApp extends StatelessWidget {
     return MaterialApp(
       title: 'OwnWords',
       theme: AppTheme.lightTheme,
-      builder: (context, child) {
-        return Container(
-          color: Colors.black, // Solid Black area for the system nav bar globally
-          child: SafeArea(
-            top: false,
-            bottom: true, // Keep UI strictly above the bottom system bar globally
-            child: child ?? const SizedBox.shrink(),
-          ),
-        );
-      },
       // Instant screen transitions — eliminate all animation lag
       onGenerateRoute: (settings) {
         return PageRouteBuilder(

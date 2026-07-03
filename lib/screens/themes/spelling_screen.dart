@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import '../../state/quest_controller.dart';
 import '../../state/quest_state.dart';
 import '../../theme/app_theme.dart';
@@ -17,7 +16,6 @@ class SpellingScreen extends ConsumerStatefulWidget {
 }
 
 class _SpellingScreenState extends ConsumerState<SpellingScreen> with TickerProviderStateMixin {
-  final FlutterTts _tts = FlutterTts();
   List<WordRecord> _playList = [];
   int _currentIndex = 0;
   final _controller = TextEditingController();
@@ -37,7 +35,6 @@ class _SpellingScreenState extends ConsumerState<SpellingScreen> with TickerProv
   void initState() {
     super.initState();
     _isAudioMode = widget.isAudioMode;
-    _initTts();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initDeck();
       _focusNode.requestFocus();
@@ -48,18 +45,11 @@ class _SpellingScreenState extends ConsumerState<SpellingScreen> with TickerProv
     });
   }
 
-  Future<void> _initTts() async {
-    await _tts.setLanguage("en-US");
-    await _tts.setSpeechRate(0.5);
-    await _tts.setVolume(1.0);
-    await _tts.setPitch(1.0);
-  }
-
   @override
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
-    _tts.stop();
+    ref.read(audioServiceProvider).stopTts();
     super.dispose();
   }
 
@@ -78,7 +68,7 @@ class _SpellingScreenState extends ConsumerState<SpellingScreen> with TickerProv
 
   Future<void> _speak() async {
     if (_playList.isEmpty) return;
-    await _tts.speak(_playList[_currentIndex].english);
+    await ref.read(audioServiceProvider).speak(_playList[_currentIndex].english);
   }
 
   Future<void> _submit() async {
@@ -261,7 +251,7 @@ class _SpellingScreenState extends ConsumerState<SpellingScreen> with TickerProv
                 style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w900, color: AppTheme.textMain),
                 textAlign: TextAlign.center),
               const SizedBox(height: 4),
-              Text(state.direction == StudyDirection.trToEn ? 'İngilizce çevirisini yaz' : 'Türkçe Karşılığını yaz', style: const TextStyle(color: AppTheme.textMuted, fontSize: 14)),
+              Text(state.direction == StudyDirection.trToEn ? 'Yabancı dildeki karşılığını yaz' : 'Türkçe karşılığını yaz', style: const TextStyle(color: AppTheme.textMuted, fontSize: 14)),
             ],
           ],
         ),

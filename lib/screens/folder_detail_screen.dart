@@ -53,9 +53,9 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                 const Text('Her satıra bir kelime gelecek şekilde yazın.', style: TextStyle(color: AppTheme.textMuted)),
                 const SizedBox(height: 24),
                 
-                _batchInputField('English (İngilizce)', engController, AppTheme.skyBlue),
+                _batchInputField('Yabancı Kelime', engController, AppTheme.skyBlue),
                 const SizedBox(height: 12),
-                _batchInputField('Türkçe Karşılıkları', trController, AppTheme.bubblegumPink),
+                _batchInputField('Türkçe Anlamı', trController, AppTheme.bubblegumPink),
                 
                 const SizedBox(height: 20),
                 SizedBox(
@@ -144,9 +144,9 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                   const SizedBox(height: 32),
                   const Text('Antrenman Yönü', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 24, color: AppTheme.textMain)),
                   const SizedBox(height: 32),
-                  _directionButton(ctx, '🇹🇷  Türkçe → İngilizce', StudyDirection.trToEn, AppTheme.bubblegumPink),
+                  _directionButton(ctx, '🇹🇷  Türkçe → Yabancı Dil', StudyDirection.trToEn, AppTheme.bubblegumPink),
                   const SizedBox(height: 16),
-                  _directionButton(ctx, '🇬🇧  İngilizce → Türkçe', StudyDirection.enToTr, AppTheme.skyBlue),
+                  _directionButton(ctx, '🌐  Yabancı Dil → Türkçe', StudyDirection.enToTr, AppTheme.skyBlue),
                   const SizedBox(height: 32),
                 ],
               ),

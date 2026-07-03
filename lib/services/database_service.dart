@@ -23,7 +23,7 @@ class DatabaseService {
     final path = join(dbPath, filePath);
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
@@ -63,6 +63,8 @@ class DatabaseService {
       )
     ''');
 
+    await db.execute('CREATE INDEX idx_words_folderId ON words(folderId)');
+
     await db.execute('''
       CREATE TABLE daily_stats (
         date TEXT PRIMARY KEY,
@@ -93,7 +95,8 @@ class DatabaseService {
         current INTEGER NOT NULL DEFAULT 0,
         xpReward INTEGER NOT NULL,
         isCompleted INTEGER NOT NULL DEFAULT 0,
-        date TEXT NOT NULL
+        date TEXT NOT NULL,
+        type TEXT NOT NULL DEFAULT 'legacy'
       )
     ''');
   }
@@ -200,6 +203,18 @@ class DatabaseService {
         );
       } catch (_) {}
     }
+    if (oldVersion < 6) {
+      try {
+        await db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_words_folderId ON words(folderId)',
+        );
+      } catch (_) {}
+      try {
+        await db.execute(
+          'ALTER TABLE daily_missions ADD COLUMN type TEXT NOT NULL DEFAULT "legacy"',
+        );
+      } catch (_) {}
+    }
   }
 
   // ==== FOLDER CRUD ====
@@ -214,6 +229,18 @@ class DatabaseService {
     final db = await instance.database;
     final res = await db.rawQuery('SELECT COUNT(*) FROM words');
     return Sqflite.firstIntValue(res) ?? 0;
+  }
+
+  Future<Map<String, int>> getFolderWordCounts() async {
+    final db = await database;
+    final res = await db.rawQuery('SELECT folderId, COUNT(*) as count FROM words GROUP BY folderId');
+    final Map<String, int> counts = {};
+    for (final row in res) {
+      final folderId = row['folderId'] as String;
+      final count = row['count'] as int;
+      counts[folderId] = count;
+    }
+    return counts;
   }
 
   Future<List<Folder>> getAllFolders() async {
@@ -309,8 +336,9 @@ class DatabaseService {
     List<String> englishWords,
     List<String> turkishWords,
   ) async {
-    if (englishWords.length != turkishWords.length)
+    if (englishWords.length != turkishWords.length) {
       throw Exception('Listeler aynı uzunlukta olmalıdır');
+    }
     final db = await database;
     final batch = db.batch();
     for (int i = 0; i < englishWords.length; i++) {
